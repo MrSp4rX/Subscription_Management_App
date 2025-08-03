@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #f4f4f4;
+    }
+    .profile-card {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 1rem;
+    }
+    .info {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      background: #007BFF;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-card">
+    <h2>Welcome, <span id="username">{{ user.username }}</span>!</h2>
+    <div class="info">Email: <span id="email">{{ user.email }}</span></div>
+    <form id="logoutForm">
+      <button type="submit">Logout</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("logoutForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const res = await fetch("/logout", { method: "POST" });
+      if (res.ok) {
+        window.location.href = "/";
+      } else {
+        alert("Logout failed");
+      }
+    });
+  </script>
+</body>
+</html>

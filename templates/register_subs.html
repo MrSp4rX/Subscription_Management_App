@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Register Subscription</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f5;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .message {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Register Subscription</h2>
+    <form id="subscriptionForm">
+      <label for="name">Subscription Name*</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="plan">Plan*</label>
+      <select id="plan" name="plan" required>
+        <option value="Basic">Basic (7 days / 10 calls/day) - $5</option>
+        <option value="Starter">Starter (30 days / 50 calls/day) - $15</option>
+        <option value="Pro">Pro (90 days / 200 calls/day) - $40</option>
+        <option value="Business">Business (180 days / 500 calls/day) - $70</option>
+        <option value="Enterprise">Enterprise (365 days / Unlimited) - $120</option>
+      </select>
+
+      </select>
+
+      <button type="submit">Register Subscription</button>
+    </form>
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('subscriptionForm');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        name: form.name.value,
+        plan: form.plan.value
+      };
+
+      try {
+        const response = await fetch('/subscriptions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          messageDiv.textContent = result.message;
+          messageDiv.className = 'message success';
+          form.reset();
+        } else {
+          messageDiv.textContent = result.error || 'Registration failed.';
+          messageDiv.className = 'message error';
+        }
+      } catch (err) {
+        messageDiv.textContent = 'Error submitting form.';
+        messageDiv.className = 'message error';
+      }
+    });
+  </script>
+</body>
+
+</html>

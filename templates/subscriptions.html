@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>My Subscriptions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      padding: 40px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 30px 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    thead {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    th,
+    td {
+      padding: 12px 20px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .table-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .cancel-btn {
+      background-color: #dc3545;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .cancel-btn:hover {
+      background-color: #c82333;
+    }
+
+    .renew-btn {
+      background-color: #28a745;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .renew-btn:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="table-container">
+    <h2>Active Subscriptions</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Subscription Name</th>
+          <th>Start Date</th>
+          <th>Plan</th>
+          <th>Renewal Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in subs %}
+        <tr data-id="{{ sub._id }}">
+          <td>{{ sub.name }}</td>
+          <td>{{ sub.start_date }}</td>
+          <td>{{ sub.plan }}</td>
+          <td>{{ sub.renewal_date }}</td>
+          <td>{{ sub.status }}</td>
+          <td>
+            {% if sub.status == 'active' %}
+            <button class="cancel-btn">Cancel</button>
+            {% elif sub.status == 'deactivated' %}
+            <button class="renew-btn">Renew</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.cancel-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+          const row = e.target.closest('tr');
+          const subscriptionId = row.getAttribute('data-id');
+
+          if (!subscriptionId) {
+            alert('Subscription ID not found!');
+            return;
+          }
+
+          const confirmed = confirm('Are you sure you want to cancel this subscription?');
+          if (!confirmed) return;
+
+          try {
+            const response = await fetch(`/subscriptions/${subscriptionId}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              alert('Subscription cancelled successfully.'); 
+              row.querySelector('td:nth-child(5)').textContent = 'deactivated';
+              e.target.textContent = 'Renew'; 
+              e.target.classList.add('renew-btn');
+              e.target.classList.remove('cancel-btn');
+            } else {
+              const data = await response.json();
+              alert('Failed to cancel subscription: ' + (data.error || 'Unknown error'));
+            }
+          } catch (error) {
+            alert('Error cancelling subscription: ' + error.message);
+          }
+          location.reload();
+
+        });
+      });
+      }
+    );
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.renew-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+          const row = e.target.closest('tr');
+          const subscriptionId = row.getAttribute('data-id');
+
+          if (!subscriptionId) {
+            alert('Subscription ID not found!');
+            return;
+          }
+
+          const confirmed = confirm('Are you sure you want to Renew this subscription?');
+          if (!confirmed) return;
+
+          try {
+            const response = await fetch(`/subscriptions/${subscriptionId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+
+            if (response.ok) {
+              alert('Subscription Renewed successfully.');
+              row.querySelector('td:nth-child(5)').textContent = 'active';
+              e.target.textContent = 'Cancel'; 
+              e.target.classList.add('cancel-btn');
+              e.target.classList.remove('renew-btn');
+            } else {
+              const data = await response.json();
+              alert('Failed to Renew subscription: ' + (data.error || 'Unknown error'));
+            }
+          } catch (error) {
+            alert('Error Renewing subscription: ' + error.message);
+          }
+          location.reload();
+
+        });
+      });
+      }
+    );
+  </script>
+
+</body>
+
+</html>
